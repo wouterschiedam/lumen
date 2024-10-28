@@ -122,12 +122,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a smart assistant that can analyze code diffs from github and provide a summary. No extra explanations, just the concise summary.",
+                        "content": r#"You are a helpful assistant that analyzes git commits. \
+                                     Provide a concise summary of the changes based on the commit message and diff content. \
+                                     Focus on the impact and purpose of the changes."#
                     },
                     {
                         "role": "user",
                         "content": format!(
-                            "Diff:\n{}\n\nCommit message:\n{}",
+                            "Diff:\n{}\n\nCommit message:\n{}\n\nPlease provide a clear and concise summary of these changes. Don't sound like an AI. Don't use filler words.",
                             String::from_utf8(diff.stdout).unwrap(),
                             String::from_utf8(commit_message.stdout).unwrap()
                         ),
