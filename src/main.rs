@@ -4,6 +4,7 @@ use reqwest;
 use serde::Deserialize;
 use serde_json::json;
 use std::error::Error;
+use std::process::Command;
 use tokio;
 
 const SERVICE_NAME: &str = "lumen";
@@ -28,10 +29,9 @@ enum Commands {
         api_key: String,
     },
     /// Generate a text completion
-    Complete {
-        /// The prompt to complete
-        #[arg(short, long)]
-        prompt: String,
+    Explain {
+        #[arg()]
+        sha: String,
     },
 }
 
@@ -97,18 +97,40 @@ async fn main() -> Result<(), Box<dyn Error>> {
         Commands::Configure { api_key } => {
             save_api_key(&api_key)?;
         }
-        Commands::Complete { prompt } => {
+        Commands::Explain { sha } => {
             let api_key = cli.api_key.unwrap_or_else(|| get_api_key().unwrap());
+
+            let diff = Command::new("git")
+                .args([
+                    "diff-tree",
+                    "-p",
+                    "--binary",
+                    "--no-color",
+                    "--compact-summary",
+                    &sha,
+                ])
+                .output()
+                .expect("failed to execute process");
+
+            let commit_message = Command::new("git")
+                .args(["log", "--format=%B", "-n", "1", &sha])
+                .output()
+                .expect("failed to execute process");
+
             let payload = json!({
                 "model": "gpt-4o-mini",
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a helpful assistant."
+                        "content": "You are a smart assistant that can analyze code diffs from github and provide a summary. No extra explanations, just the concise summary.",
                     },
                     {
                         "role": "user",
-                        "content": prompt,
+                        "content": format!(
+                            "Diff:\n{}\n\nCommit message:\n{}",
+                            String::from_utf8(diff.stdout).unwrap(),
+                            String::from_utf8(commit_message.stdout).unwrap()
+                        ),
                     }
                 ]
             });
