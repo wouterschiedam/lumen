@@ -42,33 +42,43 @@ impl GitCommit {
             .output()
             .expect("failed to execute process");
 
-        String::from_utf8(commit_message.stdout).unwrap()
+        let mut commit_message = String::from_utf8(commit_message.stdout).unwrap();
+        commit_message.pop(); // remove trailing newline from echo
+        commit_message.pop();
+
+        commit_message
     }
 
     fn get_author_name(sha: &str) -> String {
-        let commit_message = std::process::Command::new("git")
+        let name = std::process::Command::new("git")
             .args(["log", "--format=%an", "-n", "1", &sha])
             .output()
             .expect("failed to execute process");
 
-        String::from_utf8(commit_message.stdout).unwrap()
+        let mut name = String::from_utf8(name.stdout).unwrap();
+        name.pop(); // remove trailing newline from echo
+
+        name
     }
 
     fn get_author_email(sha: &str) -> String {
-        let commit_message = std::process::Command::new("git")
+        let email = std::process::Command::new("git")
             .args(["log", "--format=%ae", "-n", "1", &sha])
             .output()
             .expect("failed to execute process");
 
-        String::from_utf8(commit_message.stdout).unwrap()
+        let mut email = String::from_utf8(email.stdout).unwrap();
+        email.pop(); // remove trailing newline from echo
+
+        email
     }
 
     fn get_date(sha: &str) -> String {
-        let commit_message = std::process::Command::new("git")
+        let date = std::process::Command::new("git")
             .args([
                 "log",
                 "--format=%cd",
-                "--date=format:'%Y-%m-%d %H:%M:%S'",
+                "--date=format:%Y-%m-%d %H:%M:%S",
                 "-n",
                 "1",
                 &sha,
@@ -76,6 +86,9 @@ impl GitCommit {
             .output()
             .expect("failed to execute process");
 
-        String::from_utf8(commit_message.stdout).unwrap()
+        let mut date = String::from_utf8(date.stdout).unwrap();
+        date.pop(); // remove trailing newline from echo
+
+        date
     }
 }
