@@ -24,7 +24,7 @@ impl LumenProvider {
         api_key: Option<String>,
     ) -> Self {
         match provider_type {
-            ProviderType::OpenAI => {
+            ProviderType::Openai => {
                 let api_key = api_key.expect(
                     "api_key will always be Some when provider is OpenAI due to required_if_eq",
                 );

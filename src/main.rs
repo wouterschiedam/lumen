@@ -17,7 +17,7 @@ struct Cli {
 
 #[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
 enum ProviderType {
-    OpenAI,
+    Openai,
     Phind,
 }
 
