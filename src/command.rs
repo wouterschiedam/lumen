@@ -1,4 +1,3 @@
-use std::io::Write;
 use std::process;
 use std::process::Stdio;
 
@@ -34,22 +33,27 @@ impl LumenCommand {
 
         spinner.success("Done");
 
-        // attempt to format using mdcat
-        let mut mdcat = std::process::Command::new("mdcat")
+        // Try to use mdcat, fall back to direct printing if it fails
+        match std::process::Command::new("mdcat")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .spawn()
-            .unwrap();
-
-        let _source = std::process::Command::new("echo")
-            .arg(result)
-            .stdout(mdcat.stdin.take().unwrap())
-            .spawn()
-            .unwrap();
-
-        let output = mdcat.wait_with_output().unwrap();
-
-        println!("{}", String::from_utf8(output.stdout).unwrap());
+        {
+            Ok(mut mdcat) => {
+                if let Some(stdin) = mdcat.stdin.take() {
+                    std::process::Command::new("echo")
+                        .arg(&result)
+                        .stdout(stdin)
+                        .spawn()?
+                        .wait()?;
+                }
+                let output = mdcat.wait_with_output()?;
+                println!("{}", String::from_utf8(output.stdout)?);
+            }
+            Err(_) => {
+                println!("{}", result);
+            }
+        }
 
         Ok(())
     }
