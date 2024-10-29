@@ -11,6 +11,12 @@ mod provider;
 #[command(name = "lumen")]
 #[command(about = "A CLI wrapper for AI interactions", long_about = None)]
 struct Cli {
+    #[arg(value_enum, short = 'p', long = "provider", default_value = "phind")]
+    provider: ProviderType,
+
+    #[arg(short = 'k', long = "api-key", required_if_eq("provider", "openai"))]
+    api_key: Option<String>,
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -26,42 +32,20 @@ enum Commands {
     Explain {
         #[arg()]
         sha: String,
-
-        #[arg(value_enum, short = 'p', long = "provider", default_value = "phind")]
-        provider: ProviderType,
-
-        #[arg(short = 'k', long = "api-key", required_if_eq("provider", "openai"))]
-        api_key: Option<String>,
     },
-    List {
-        #[arg(value_enum, short = 'p', long = "provider", default_value = "phind")]
-        provider: ProviderType,
-
-        #[arg(short = 'k', long = "api-key", required_if_eq("provider", "openai"))]
-        api_key: Option<String>,
-    },
+    List,
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
     let cli = Cli::parse();
     let client = reqwest::Client::new();
+    let provider = provider::LumenProvider::new(client, cli.provider, cli.api_key);
+    let command = command::LumenCommand::new(provider);
 
     match cli.command {
-        Commands::Explain {
-            sha,
-            provider,
-            api_key,
-        } => {
-            let provider = provider::LumenProvider::new(client, provider, api_key);
-            let command = command::LumenCommand::new(provider);
-            command.explain(sha).await?;
-        }
-        Commands::List { provider, api_key } => {
-            let provider = provider::LumenProvider::new(client, provider, api_key);
-            let command = command::LumenCommand::new(provider);
-            command.list().await?;
-        }
+        Commands::Explain { sha } => command.explain(sha).await?,
+        Commands::List => command.list().await?,
     }
 
     Ok(())
