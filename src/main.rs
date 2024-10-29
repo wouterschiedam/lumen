@@ -4,6 +4,7 @@ use std::error::Error;
 use tokio;
 
 mod command;
+mod git_commit;
 mod provider;
 
 #[derive(Parser)]

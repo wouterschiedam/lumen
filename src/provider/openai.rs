@@ -1,3 +1,5 @@
+use crate::git_commit::GitCommit;
+
 use super::AIProvider;
 use async_trait::async_trait;
 use serde::Deserialize;
@@ -51,11 +53,7 @@ async fn get_completion_result(
 
 #[async_trait]
 impl AIProvider for OpenAIProvider {
-    async fn explain(
-        &self,
-        diff: String,
-        commit_message: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
         let payload = json!({
             "model": "gpt-4o-mini",
             "messages": [
@@ -69,8 +67,8 @@ impl AIProvider for OpenAIProvider {
                     "role": "user",
                     "content": format!(
                         "Diff:\n{}\n\nCommit message:\n{}\n\nPlease provide a clear and concise summary of these changes. Don't sound like an AI. Don't use filler words.",
-                        diff,
-                        commit_message
+                        commit.diff,
+                        commit.message
                     ),
                 }
             ]

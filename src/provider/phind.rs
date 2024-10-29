@@ -1,3 +1,5 @@
+use crate::git_commit::GitCommit;
+
 use super::AIProvider;
 use async_trait::async_trait;
 use reqwest::header::{HeaderMap, HeaderValue};
@@ -102,12 +104,8 @@ impl PhindProvider {
 
 #[async_trait]
 impl AIProvider for PhindProvider {
-    async fn explain(
-        &self,
-        diff: String,
-        commit_message: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
-        let request = self.create_request(&commit_message, &diff).await?;
+    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
+        let request = self.create_request(&commit.message, &commit.diff).await?;
         let headers = Self::create_headers()?;
 
         let response = self

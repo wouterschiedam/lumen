@@ -2,18 +2,14 @@ use async_trait::async_trait;
 use openai::OpenAIProvider;
 use phind::PhindProvider;
 
-use crate::ProviderType;
+use crate::{git_commit::GitCommit, ProviderType};
 
 pub mod openai;
 pub mod phind;
 
 #[async_trait]
 pub trait AIProvider {
-    async fn explain(
-        &self,
-        diff: String,
-        commit_message: String,
-    ) -> Result<String, Box<dyn std::error::Error>>;
+    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>>;
 }
 
 pub enum LumenProvider {
@@ -41,14 +37,10 @@ impl LumenProvider {
 
 #[async_trait]
 impl AIProvider for LumenProvider {
-    async fn explain(
-        &self,
-        diff: String,
-        commit_message: String,
-    ) -> Result<String, Box<dyn std::error::Error>> {
+    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
         match self {
-            LumenProvider::OpenAI(provider) => provider.explain(diff, commit_message).await,
-            LumenProvider::Phind(provider) => provider.explain(diff, commit_message).await,
+            LumenProvider::OpenAI(provider) => provider.explain(commit).await,
+            LumenProvider::Phind(provider) => provider.explain(commit).await,
         }
     }
 }
