@@ -1,5 +1,4 @@
-use clap::{command, Parser, Subcommand};
-use provider::{openai::OpenAIProvider, phind::PhindProvider};
+use clap::{command, Parser, Subcommand, ValueEnum};
 use reqwest;
 use std::error::Error;
 use tokio;
@@ -15,11 +14,23 @@ struct Cli {
     command: Commands,
 }
 
+#[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
+enum ProviderType {
+    OpenAI,
+    Phind,
+}
+
 #[derive(Subcommand)]
 enum Commands {
     Explain {
         #[arg()]
         sha: String,
+
+        #[arg(value_enum, short = 'p', long = "provider", default_value = "phind")]
+        provider: ProviderType,
+
+        #[arg(short = 'k', long = "api-key", required_if_eq("provider", "openai"))]
+        api_key: Option<String>,
     },
 }
 
@@ -29,11 +40,14 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let client = reqwest::Client::new();
 
     match cli.command {
-        Commands::Explain { sha } => {
-            let provider = PhindProvider::new(client, None);
-            let command = command::LumenCommand::new(Box::new(provider));
+        Commands::Explain {
+            sha,
+            provider,
+            api_key,
+        } => {
+            let provider = provider::LumenProvider::new(client, provider, api_key);
+            let command = command::LumenCommand::new(provider);
             let result = command.explain(sha).await?;
-
             println!("{}", result);
         }
     }

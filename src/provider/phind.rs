@@ -1,8 +1,7 @@
+use super::AIProvider;
 use async_trait::async_trait;
 use reqwest::header::{HeaderMap, HeaderValue};
 use serde::{Deserialize, Serialize};
-
-use super::LumenProvider;
 
 #[derive(Debug, Serialize, Deserialize)]
 struct Message {
@@ -102,7 +101,7 @@ impl PhindProvider {
 }
 
 #[async_trait]
-impl LumenProvider for PhindProvider {
+impl AIProvider for PhindProvider {
     async fn explain(
         &self,
         diff: String,

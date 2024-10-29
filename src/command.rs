@@ -1,11 +1,12 @@
+use crate::provider::AIProvider;
 use crate::provider::LumenProvider;
 
 pub struct LumenCommand {
-    provider: Box<dyn LumenProvider>,
+    provider: LumenProvider,
 }
 
 impl LumenCommand {
-    pub fn new(provider: Box<dyn LumenProvider>) -> Self {
+    pub fn new(provider: LumenProvider) -> Self {
         LumenCommand { provider }
     }
 

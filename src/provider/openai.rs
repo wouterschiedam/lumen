@@ -1,8 +1,7 @@
+use super::AIProvider;
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde_json::json;
-
-use crate::provider::LumenProvider;
 
 pub struct OpenAIProvider {
     client: reqwest::Client,
@@ -51,7 +50,7 @@ async fn get_completion_result(
 }
 
 #[async_trait]
-impl LumenProvider for OpenAIProvider {
+impl AIProvider for OpenAIProvider {
     async fn explain(
         &self,
         diff: String,
