@@ -54,6 +54,11 @@ async fn get_completion_result(
 #[async_trait]
 impl AIProvider for OpenAIProvider {
     async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
+        let user_input = format!(
+            "Please analyze this git commit and provide a summary.\n\nCommit Message:\n{}\n\nDiff Content:\n{}",
+            commit.message, commit.diff
+        );
+
         let payload = json!({
             "model": "gpt-4o-mini",
             "messages": [
@@ -65,11 +70,7 @@ impl AIProvider for OpenAIProvider {
                 },
                 {
                     "role": "user",
-                    "content": format!(
-                        "Diff:\n{}\n\nCommit message:\n{}\n\nPlease provide a clear and concise summary of these changes. Don't sound like an AI. Don't use filler words.",
-                        commit.diff,
-                        commit.message
-                    ),
+                    "content": user_input,
                 }
             ]
         });
