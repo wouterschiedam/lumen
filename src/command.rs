@@ -13,6 +13,7 @@ impl LumenCommand {
 
     pub async fn explain(&self, sha: String) -> Result<String, Box<dyn std::error::Error>> {
         let commit = GitCommit::new(sha);
+        dbg!(&commit);
 
         let result = self.provider.explain(commit).await?;
 
