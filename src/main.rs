@@ -55,14 +55,12 @@ async fn main() -> Result<(), Box<dyn Error>> {
         } => {
             let provider = provider::LumenProvider::new(client, provider, api_key);
             let command = command::LumenCommand::new(provider);
-            let result = command.explain(sha).await?;
-            println!("{}", result);
+            command.explain(sha).await?;
         }
         Commands::List { provider, api_key } => {
             let provider = provider::LumenProvider::new(client, provider, api_key);
             let command = command::LumenCommand::new(provider);
-            let result = command.list().await?;
-            println!("{}", result);
+            command.list().await?;
         }
     }
 
