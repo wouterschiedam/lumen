@@ -23,7 +23,7 @@ impl LumenCommand {
         let result = self.provider.explain(commit.clone()).await?;
 
         let result = format!(
-            "commit {} | Author: {} <{}> | Date: {}\n\n{}\n-----\n{}",
+            "`commit {}` | {} <{}> | {}\n\n{}\n-----\n{}",
             commit.full_hash,
             commit.author_name,
             commit.author_email,
