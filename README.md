@@ -4,9 +4,10 @@
 
 lumen is a free CLI tool that uses AI to summarise git commits.
 
-![lumen-demo](https://github.com/user-attachments/assets/2e84e4aa-a86f-47e6-b939-1e34035dbb02)
+![demo](https://github.com/user-attachments/assets/0d029bdb-3b11-4b5c-bed6-f5a91d8529f2)
 
 ### Supported providers
+
 | Provider                                                                                                             | API Key Required | Models                                                                                      |
 |----------------------------------------------------------------------------------------------------------------------|------------------|---------------------------------------------------------------------------------------------|
 | [Groq](https://groq.com/) `groq`                                                                                   | Yes (free)      | `llama2-70b-4096`, `mixtral-8x7b-32768` (default: `mixtral-8x7b-32768`)                     |
