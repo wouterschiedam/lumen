@@ -36,6 +36,7 @@ struct Cli {
 enum ProviderType {
     Openai,
     Phind,
+    Groq,
 }
 
 #[derive(Subcommand)]

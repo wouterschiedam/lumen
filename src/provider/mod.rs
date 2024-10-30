@@ -1,9 +1,11 @@
 use async_trait::async_trait;
+use groq::GroqProvider;
 use openai::OpenAIProvider;
 use phind::PhindProvider;
 
 use crate::{git_commit::GitCommit, ProviderType};
 
+pub mod groq;
 pub mod openai;
 pub mod phind;
 
@@ -15,6 +17,7 @@ pub trait AIProvider {
 pub enum LumenProvider {
     OpenAI(Box<OpenAIProvider>),
     Phind(Box<PhindProvider>),
+    Groq(Box<GroqProvider>),
 }
 
 impl LumenProvider {
@@ -31,6 +34,12 @@ impl LumenProvider {
                 LumenProvider::OpenAI(Box::new(OpenAIProvider::new(client, api_key)))
             }
             ProviderType::Phind => LumenProvider::Phind(Box::new(PhindProvider::new(client, None))),
+            ProviderType::Groq => {
+                let api_key = api_key.expect(
+                    "api_key will always be Some when provider is Groq due to required_if_eq",
+                );
+                LumenProvider::Groq(Box::new(GroqProvider::new(client, api_key)))
+            }
         }
     }
 }
@@ -41,6 +50,7 @@ impl AIProvider for LumenProvider {
         match self {
             LumenProvider::OpenAI(provider) => provider.explain(commit).await,
             LumenProvider::Phind(provider) => provider.explain(commit).await,
+            LumenProvider::Groq(provider) => provider.explain(commit).await,
         }
     }
 }
