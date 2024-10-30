@@ -11,17 +11,28 @@ mod provider;
 #[command(name = "lumen")]
 #[command(about = "A CLI wrapper for AI interactions", long_about = None)]
 struct Cli {
-    #[arg(value_enum, short = 'p', long = "provider", default_value = "phind")]
+    #[arg(
+        value_enum,
+        short = 'p',
+        long = "provider",
+        env("LUMEN_AI_PROVIDER"),
+        default_value = "phind"
+    )]
     provider: ProviderType,
 
-    #[arg(short = 'k', long = "api-key", required_if_eq("provider", "openai"))]
+    #[arg(
+        short = 'k',
+        long = "api-key",
+        env = "LUMEN_API_KEY",
+        required_if_eq("provider", "openai")
+    )]
     api_key: Option<String>,
 
     #[command(subcommand)]
     command: Commands,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, ValueEnum)]
+#[derive(Copy, Clone, PartialEq, Eq, ValueEnum, Debug)]
 enum ProviderType {
     Openai,
     Phind,

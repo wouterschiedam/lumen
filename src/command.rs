@@ -59,7 +59,7 @@ impl LumenCommand {
     }
 
     pub async fn list(&self) -> Result<(), Box<dyn std::error::Error>> {
-        let command = "git log --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' | fzf --ansi --no-sort --reverse --bind='enter:become(echo {1})' --wrap";
+        let command = "git log --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' | fzf --ansi --reverse --bind='enter:become(echo {1})' --wrap";
 
         let output = std::process::Command::new("sh")
             .arg("-c")
