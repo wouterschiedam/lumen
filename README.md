@@ -3,13 +3,10 @@
 
 Supports OpenAI, Phind, and Groq
 
+![lumen-demo](https://github.com/user-attachments/assets/2e84e4aa-a86f-47e6-b939-1e34035dbb02)
+
 ## Installation
-
-### Cargo
-
-```bash
-cargo install lumen
-```
+1. Cargo: `cargo install lumen`
 
 ## Prerequisites
 1. git
