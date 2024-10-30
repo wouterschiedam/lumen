@@ -11,7 +11,7 @@ mod provider;
 
 #[derive(Parser)]
 #[command(name = "lumen")]
-#[command(about = "A CLI wrapper for AI interactions", long_about = None)]
+#[command(about = "AI-powered CLI tool for git commit summaries", long_about = None)]
 struct Cli {
     #[arg(
         value_enum,
