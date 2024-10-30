@@ -1,9 +1,11 @@
 use clap::{command, Parser, Subcommand, ValueEnum};
+use error::LumenError;
 use reqwest;
-use std::error::Error;
+use std::process;
 use tokio;
 
 mod command;
+mod error;
 mod git_commit;
 mod provider;
 
@@ -49,7 +51,14 @@ enum Commands {
 }
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn Error>> {
+async fn main() {
+    if let Err(e) = run().await {
+        eprintln!("\x1b[91m\rError: {e}\x1b[0m");
+        process::exit(1);
+    }
+}
+
+async fn run() -> Result<(), LumenError> {
     let cli = Cli::parse();
     let client = reqwest::Client::new();
     let provider = provider::LumenProvider::new(client, cli.provider, cli.api_key);

@@ -1,6 +1,7 @@
 use std::process;
 use std::process::Stdio;
 
+use crate::error::LumenError;
 use crate::git_commit::GitCommit;
 use crate::provider::AIProvider;
 use crate::provider::LumenProvider;
@@ -16,9 +17,9 @@ impl LumenCommand {
         LumenCommand { provider }
     }
 
-    pub async fn explain(&self, sha: String) -> Result<(), Box<dyn std::error::Error>> {
-        let mut spinner = Spinner::new(spinners::Dots, "Loading", Color::Blue);
-        let commit = GitCommit::new(sha.clone());
+    pub async fn explain(&self, sha: String) -> Result<(), LumenError> {
+        let mut spinner = Spinner::new(spinners::Dots, "Loading...", Color::Blue);
+        let commit = GitCommit::new(sha)?;
         let result = self.provider.explain(commit.clone()).await?;
 
         let result = format!(
@@ -58,7 +59,7 @@ impl LumenCommand {
         Ok(())
     }
 
-    pub async fn list(&self) -> Result<(), Box<dyn std::error::Error>> {
+    pub async fn list(&self) -> Result<(), LumenError> {
         let command = "git log --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' | fzf --ansi --reverse --bind='enter:become(echo {1})' --wrap";
 
         let output = std::process::Command::new("sh")
