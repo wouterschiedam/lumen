@@ -1,6 +1,6 @@
 #[derive(Clone, Debug)]
 pub struct GitCommit {
-    pub sha: String,
+    pub full_hash: String,
     pub message: String,
     pub diff: String,
     pub author_name: String,
@@ -11,13 +11,25 @@ pub struct GitCommit {
 impl GitCommit {
     pub fn new(sha: String) -> Self {
         GitCommit {
-            sha: sha.clone(),
+            full_hash: Self::get_full_hash(&sha),
             message: Self::get_message(&sha),
             diff: Self::get_diff(&sha),
             author_name: Self::get_author_name(&sha),
             author_email: Self::get_author_email(&sha),
             date: Self::get_date(&sha),
         }
+    }
+
+    pub fn get_full_hash(sha: &str) -> String {
+        let full_hash = std::process::Command::new("git")
+            .args(["rev-parse", &sha])
+            .output()
+            .expect("failed to execute process");
+
+        let mut full_hash = String::from_utf8(full_hash.stdout).unwrap();
+        full_hash.pop();
+
+        full_hash
     }
 
     fn get_diff(sha: &str) -> String {
