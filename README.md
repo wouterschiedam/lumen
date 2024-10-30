@@ -15,15 +15,23 @@ lumen is a free CLI tool that uses AI to summarise git commits without requiring
 | [Phind](https://www.phind.com/agent) `phind` (Default)                                                             | No              | `Phind-70B`                                                                                |
 
 
-## Installation
-1. Cargo: `cargo install lumen`
+# Installation
+### Using [Homebrew](https://brew.sh/) (MacOS and Linux)
+```
+brew tap jnsahaj/lumen
+brew install lumen --formula
+```
+### Using [Cargo](https://github.com/rust-lang/cargo)
+```
+cargo install lumen
+```
 
-## Prerequisites
+# Prerequisites
 1. git
 2. [fzf](https://github.com/junegunn/fzf) (optional): Required for `lumen list` command
 3. [mdcat](https://github.com/swsnr/mdcat) (optional): Required for pretty output formatting
 
-## Usage
+# Usage
 
 ```zsh
 $ lumen --help
