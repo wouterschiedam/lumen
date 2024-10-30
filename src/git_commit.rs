@@ -6,6 +6,7 @@ use std::string::FromUtf8Error;
 pub enum GitCommitError {
     CommandError(String),
     InvalidCommit(String),
+    EmptyDiff(String),
 }
 
 impl From<io::Error> for GitCommitError {
@@ -25,6 +26,7 @@ impl std::fmt::Display for GitCommitError {
         match self {
             GitCommitError::CommandError(err) => write!(f, "{err}"),
             GitCommitError::InvalidCommit(sha) => write!(f, "Commit '{sha}' not found"),
+            GitCommitError::EmptyDiff(sha) => write!(f, "Diff for commit '{sha}' is empty"),
         }
     }
 }
@@ -84,7 +86,12 @@ impl GitCommit {
             ])
             .output()?;
 
-        Ok(String::from_utf8(output.stdout)?)
+        let diff = String::from_utf8(output.stdout)?;
+        if diff.is_empty() {
+            return Err(GitCommitError::EmptyDiff(sha.to_string()));
+        }
+
+        Ok(diff)
     }
 
     fn get_message(sha: &str) -> Result<String, GitCommitError> {
