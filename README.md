@@ -1,7 +1,11 @@
-# lumen
-[WIP] Free and open-source CLI tool to summarise git commits using AI
 
-Supports OpenAI, Phind, and Groq
+# <p align="center"><img src="https://github.com/user-attachments/assets/896f9239-134a-4428-9bb5-50ea59cdb5c3" alt="lumen" /></p>
+
+
+`lumen` is a free CLI tool that uses AI to summarise git commits.
+```
+Supported providers: "openai", "groq", "phind"
+```
 
 ![lumen-demo](https://github.com/user-attachments/assets/2e84e4aa-a86f-47e6-b939-1e34035dbb02)
 
