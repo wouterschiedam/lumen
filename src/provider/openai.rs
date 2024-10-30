@@ -65,7 +65,7 @@ impl AIProvider for OpenAIProvider {
         );
 
         let payload = json!({
-            "model": "gpt-4o-mini",
+            "model": self.model,
             "messages": [
                 {
                     "role": "system",
