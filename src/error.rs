@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::{git_commit::GitCommitError, provider};
+use crate::git_commit::GitCommitError;
 
 pub enum LumenError {
     GitCommitError(GitCommitError),
