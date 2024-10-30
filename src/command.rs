@@ -67,16 +67,31 @@ impl LumenCommand {
             .arg(command)
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
-            .output()
-            .expect("Failed to execute command");
+            .stderr(Stdio::piped())
+            .output()?;
 
         if !output.status.success() {
-            eprintln!("Command failed with status: {:?}", output.status);
-            process::exit(1);
+            let mut stderr = String::from_utf8(output.stderr)?;
+            stderr.pop();
+
+            let hint = match &stderr {
+                stderr if stderr.contains("fzf: command not found") => {
+                    Some("`list` command requires fzf")
+                }
+                _ => None,
+            };
+
+            let hint = match hint {
+                Some(hint) => format!("(hint: {})", hint),
+                None => String::new(),
+            };
+
+            return Err(LumenError::UnknownError(
+                format!("{} {}", stderr, hint).into(),
+            ));
         }
 
-        let mut sha = String::from_utf8(output.stdout).unwrap();
+        let mut sha = String::from_utf8(output.stdout)?;
         sha.pop(); // remove trailing newline from echo
 
         self.explain(sha).await
