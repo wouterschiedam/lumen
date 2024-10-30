@@ -11,6 +11,11 @@ Supports OpenAI, Phind, and Groq
 cargo install lumen
 ```
 
+## Prerequisites
+1. git
+2. [fzf](https://github.com/junegunn/fzf) (optional): Required for `lumen list` command
+3. [mdcat](https://github.com/swsnr/mdcat) (optional): Required for pretty output formatting
+
 ## Usage
 
 ```sh
