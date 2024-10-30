@@ -30,21 +30,18 @@ $ lumen --help
 # summarise a commit by giving its SHA-1
 # eg: lumen explain HEAD
 # eg: lumen explain cc50651f
-$ lumen explain <commit-hash>
+$ lumen explain <commit-sha>
 
 # fuzzy-search (using fzf) commits, and then `explain`
 $ lumen list
 ```
-
-### Configure AI Provider
-Using CLI args: 
+AI Provider can be configured by using CLI arguments or Environment variables.
 ```sh
-$ lumen --provider="openai" --api-key="<your-api-key>" --model="gpt-4o" explain HEAD
-$ lumen --provider="openai" --api-key="<your-api-key>" list
-```
-Using Environment variables:
-```
-LUMEN_AI_PROVIDER (default: "phind")
-LUMEN_API_KEY (when applicable)
-LUMEN_AI_MODEL (when applicable)
+-p, --provider <PROVIDER>  [env: LUMEN_AI_PROVIDER] [default: phind] [possible values: openai, phind, groq]
+-k, --api-key <API_KEY>    [env: LUMEN_API_KEY]
+-m, --model <MODEL>        [env: LUMEN_AI_MODEL]
+
+# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" explain HEAD
+# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" list
+
 ```
