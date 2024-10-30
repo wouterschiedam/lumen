@@ -3,7 +3,7 @@ use groq::GroqProvider;
 use openai::OpenAIProvider;
 use phind::PhindProvider;
 
-use crate::{git_commit::GitCommit, ProviderType};
+use crate::{error::LumenError, git_commit::GitCommit, ProviderType};
 
 pub mod groq;
 pub mod openai;
@@ -25,20 +25,23 @@ impl LumenProvider {
         client: reqwest::Client,
         provider_type: ProviderType,
         api_key: Option<String>,
-    ) -> Self {
+        model: Option<String>,
+    ) -> Result<Self, LumenError> {
         match provider_type {
             ProviderType::Openai => {
-                let api_key = api_key.expect(
-                    "api_key will always be Some when provider is OpenAI due to required_if_eq",
-                );
-                LumenProvider::OpenAI(Box::new(OpenAIProvider::new(client, api_key, None)))
+                let api_key = api_key.ok_or(LumenError::MissingApiKey("OpenAI".to_string()))?;
+                let provider =
+                    LumenProvider::OpenAI(Box::new(OpenAIProvider::new(client, api_key, model)));
+                Ok(provider)
             }
-            ProviderType::Phind => LumenProvider::Phind(Box::new(PhindProvider::new(client, None))),
+            ProviderType::Phind => Ok(LumenProvider::Phind(Box::new(PhindProvider::new(
+                client, None,
+            )))),
             ProviderType::Groq => {
-                let api_key = api_key.expect(
-                    "api_key will always be Some when provider is Groq due to required_if_eq",
-                );
-                LumenProvider::Groq(Box::new(GroqProvider::new(client, api_key)))
+                let api_key = api_key.ok_or(LumenError::MissingApiKey("Groq".to_string()))?;
+                let provider =
+                    LumenProvider::Groq(Box::new(GroqProvider::new(client, api_key, model)));
+                Ok(provider)
             }
         }
     }

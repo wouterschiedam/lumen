@@ -1,9 +1,10 @@
 use std::io;
 
-use crate::git_commit::GitCommitError;
+use crate::{git_commit::GitCommitError, provider};
 
 pub enum LumenError {
     GitCommitError(GitCommitError),
+    MissingApiKey(String),
     UnknownError(Box<dyn std::error::Error>),
 }
 
@@ -36,6 +37,7 @@ impl std::fmt::Display for LumenError {
         match self {
             LumenError::GitCommitError(err) => write!(f, "{err}"),
             LumenError::UnknownError(err) => write!(f, "{err}"),
+            LumenError::MissingApiKey(provider) => write!(f, "Missing API key for {provider}"),
         }
     }
 }

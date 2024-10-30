@@ -7,6 +7,7 @@ use serde_json::json;
 pub struct GroqProvider {
     client: reqwest::Client,
     api_key: String,
+    model: String,
 }
 
 #[derive(Deserialize)]
@@ -25,8 +26,12 @@ struct GroqMessage {
 }
 
 impl GroqProvider {
-    pub fn new(client: reqwest::Client, api_key: String) -> Self {
-        GroqProvider { client, api_key }
+    pub fn new(client: reqwest::Client, api_key: String, model: Option<String>) -> Self {
+        GroqProvider {
+            client,
+            api_key,
+            model: model.unwrap_or_else(|| "mixtral-8x7b-32768".to_string()),
+        }
     }
 }
 
@@ -59,7 +64,7 @@ impl AIProvider for GroqProvider {
         );
 
         let payload = json!({
-            "model": "mixtral-8x7b-32768",  // Groq's Mixtral model
+            "model": self.model,
             "messages": [
                 {
                     "role": "system",

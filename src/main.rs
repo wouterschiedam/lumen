@@ -22,13 +22,11 @@ struct Cli {
     )]
     provider: ProviderType,
 
-    #[arg(
-        short = 'k',
-        long = "api-key",
-        env = "LUMEN_API_KEY",
-        required_if_eq("provider", "openai")
-    )]
+    #[arg(short = 'k', long = "api-key", env = "LUMEN_API_KEY")]
     api_key: Option<String>,
+
+    #[arg(short = 'm', long = "model", env = "LUMEN_AI_MODEL")]
+    model: Option<String>,
 
     #[command(subcommand)]
     command: Commands,
@@ -61,7 +59,7 @@ async fn main() {
 async fn run() -> Result<(), LumenError> {
     let cli = Cli::parse();
     let client = reqwest::Client::new();
-    let provider = provider::LumenProvider::new(client, cli.provider, cli.api_key);
+    let provider = provider::LumenProvider::new(client, cli.provider, cli.api_key, cli.model)?;
     let command = command::LumenCommand::new(provider);
 
     match cli.command {
