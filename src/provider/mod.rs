@@ -31,7 +31,7 @@ impl LumenProvider {
                 let api_key = api_key.expect(
                     "api_key will always be Some when provider is OpenAI due to required_if_eq",
                 );
-                LumenProvider::OpenAI(Box::new(OpenAIProvider::new(client, api_key)))
+                LumenProvider::OpenAI(Box::new(OpenAIProvider::new(client, api_key, None)))
             }
             ProviderType::Phind => LumenProvider::Phind(Box::new(PhindProvider::new(client, None))),
             ProviderType::Groq => {

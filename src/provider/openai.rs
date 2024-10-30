@@ -8,6 +8,7 @@ use serde_json::json;
 pub struct OpenAIProvider {
     client: reqwest::Client,
     api_key: String,
+    model: String,
 }
 
 #[derive(Deserialize)]
@@ -26,8 +27,12 @@ struct Message {
 }
 
 impl OpenAIProvider {
-    pub fn new(client: reqwest::Client, api_key: String) -> Self {
-        OpenAIProvider { client, api_key }
+    pub fn new(client: reqwest::Client, api_key: String, model: Option<String>) -> Self {
+        OpenAIProvider {
+            client,
+            api_key,
+            model: model.unwrap_or_else(|| "gpt-4o-mini".to_string()),
+        }
     }
 }
 
