@@ -16,24 +16,7 @@ impl LumenCommand {
         LumenCommand { provider }
     }
 
-    pub async fn explain(&self, sha: String) -> Result<(), LumenError> {
-        let mut spinner = Spinner::new(spinners::Dots, "Loading...", Color::Blue);
-        let commit = GitCommit::new(sha)?;
-        let result = self.provider.explain(commit.clone()).await?;
-
-        let result = format!(
-            "`commit {}` | {} <{}> | {}\n\n{}\n-----\n{}",
-            commit.full_hash,
-            commit.author_name,
-            commit.author_email,
-            commit.date,
-            commit.message,
-            result
-        );
-
-        spinner.success("Done");
-
-        // Try to use mdcat, fall back to direct printing if it fails
+    pub fn print_with_mdcat(&self, content: String) -> Result<(), LumenError> {
         match std::process::Command::new("mdcat")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -42,7 +25,7 @@ impl LumenCommand {
             Ok(mut mdcat) => {
                 if let Some(stdin) = mdcat.stdin.take() {
                     std::process::Command::new("echo")
-                        .arg(&result)
+                        .arg(&content)
                         .stdout(stdin)
                         .spawn()?
                         .wait()?;
@@ -51,9 +34,27 @@ impl LumenCommand {
                 println!("{}", String::from_utf8(output.stdout)?);
             }
             Err(_) => {
-                println!("{}", result);
+                println!("{}", content);
             }
         }
+        Ok(())
+    }
+
+    pub async fn explain(&self, sha: String) -> Result<(), LumenError> {
+        let commit = GitCommit::new(sha)?;
+
+        let result = format!(
+            "`commit {}` | {} <{}> | {}\n\n{}\n-----\n",
+            commit.full_hash, commit.author_name, commit.author_email, commit.date, commit.message,
+        );
+
+        self.print_with_mdcat(result)?;
+
+        let mut spinner = Spinner::new(spinners::Dots, "Generating Summary...", Color::Blue);
+        let result = self.provider.explain(commit.clone()).await?;
+        spinner.success("Done");
+
+        self.print_with_mdcat(result)?;
 
         Ok(())
     }
