@@ -55,7 +55,7 @@ AI Provider can be configured by using CLI arguments or Environment variables.
 -k, --api-key <API_KEY>    [env: LUMEN_API_KEY]
 -m, --model <MODEL>        [env: LUMEN_AI_MODEL]
 
-# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" explain HEAD
-# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" list
+# eg: lumen -p="openai" -k="<your-api-key>" -m="gpt-4o" explain HEAD
+# eg: lumen -p="openai" -k="<your-api-key>" -m="gpt-4o" list
 
 ```
