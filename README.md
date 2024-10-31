@@ -22,6 +22,11 @@ brew tap jnsahaj/lumen
 brew install lumen --formula
 ```
 ### Using [Cargo](https://github.com/rust-lang/cargo)
+
+> [!IMPORTANT]
+> `cargo` is a package manager for `rust`,
+> and is installed automatically when you install `rust`.
+> see [installation guide](https://doc.rust-lang.org/cargo/getting-started/installation.html)
 ```
 cargo install lumen
 ```
