@@ -10,9 +10,11 @@
 
 | Provider                                                                                                             | API Key Required | Models                                                                                      |
 |----------------------------------------------------------------------------------------------------------------------|------------------|---------------------------------------------------------------------------------------------|
+| [Phind](https://www.phind.com/agent) `phind` (Default)                                                             | No              | `Phind-70B`                                                                                |
 | [Groq](https://groq.com/) `groq`                                                                                   | Yes (free)      | `llama2-70b-4096`, `mixtral-8x7b-32768` (default: `mixtral-8x7b-32768`)                     |
 | [OpenAI](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) `openai`                    | Yes             | `gpt-4o`, `gpt-4o-mini`, `gpt-4`, `gpt-3.5-turbo` (default: `gpt-4o-mini`)                  |
-| [Phind](https://www.phind.com/agent) `phind` (Default)                                                             | No              | `Phind-70B`                                                                                |
+| [Claude](https://claude.ai/new) `claude`                                                                     | Yes             | (see list)[https://docs.anthropic.com/en/docs/about-claude/models#model-names] (default: `claude-3-5-sonnet-20241022`) |                                                                                |
+
 
 
 # Installation
