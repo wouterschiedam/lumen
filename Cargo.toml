@@ -1,10 +1,11 @@
 [package]
 name = "lumen"
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 license = "MIT"
 description = "Instant AI Git Commit Summaries from CLI (no API key required)"
-tags = ["cli", "AI", "git", "commit", "summary"]
+keywords = ["cli", "terminal", "ai", "git", "commit"]
+categories = ["command-line-interface", "command-line-utilities"]
 repository = "https://github.com/jnsahaj/lumen"
 
 [dependencies]
