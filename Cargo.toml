@@ -3,8 +3,8 @@ name = "lumen"
 version = "0.4.0"
 edition = "2021"
 license = "MIT"
-description = "CLI tool to summarise git commits using AI"
-tags = ["cli", "AI", "git", "commit", "summarise"]
+description = "Instant AI Git Commit Summaries from CLI (no API key required)"
+tags = ["cli", "AI", "git", "commit", "summary"]
 repository = "https://github.com/jnsahaj/lumen"
 
 [dependencies]
