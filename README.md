@@ -2,7 +2,7 @@
 # <p align="center"><img src="https://github.com/user-attachments/assets/896f9239-134a-4428-9bb5-50ea59cdb5c3" alt="lumen" /></p>
 
 
-lumen is a free CLI tool that uses AI to summarise git commits without requiring an API key.
+### lumen is a free CLI tool that uses AI to summarise git commits without requiring an API key.
 
 ![demo](https://github.com/user-attachments/assets/0d029bdb-3b11-4b5c-bed6-f5a91d8529f2)
 
@@ -22,6 +22,11 @@ brew tap jnsahaj/lumen
 brew install lumen --formula
 ```
 ### Using [Cargo](https://github.com/rust-lang/cargo)
+
+> [!IMPORTANT]
+> `cargo` is a package manager for `rust`,
+> and is installed automatically when you install `rust`.
+> see [installation guide](https://doc.rust-lang.org/cargo/getting-started/installation.html)
 ```
 cargo install lumen
 ```
@@ -50,7 +55,7 @@ AI Provider can be configured by using CLI arguments or Environment variables.
 -k, --api-key <API_KEY>    [env: LUMEN_API_KEY]
 -m, --model <MODEL>        [env: LUMEN_AI_MODEL]
 
-# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" explain HEAD
-# eg: lumen --p="openai" --k="<your-api-key>" -m="gpt-4o" list
+# eg: lumen -p="openai" -k="<your-api-key>" -m="gpt-4o" explain HEAD
+# eg: lumen -p="openai" -k="<your-api-key>" -m="gpt-4o" list
 
 ```
