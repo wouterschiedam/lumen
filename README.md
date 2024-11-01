@@ -2,7 +2,7 @@
 # <p align="center"><img src="https://github.com/user-attachments/assets/896f9239-134a-4428-9bb5-50ea59cdb5c3" alt="lumen" /></p>
 
 
-lumen is a free CLI tool that uses AI to summarise git commits without requiring an API key.
+### lumen is a free CLI tool that uses AI to summarise git commits without requiring an API key.
 
 ![demo](https://github.com/user-attachments/assets/0d029bdb-3b11-4b5c-bed6-f5a91d8529f2)
 
