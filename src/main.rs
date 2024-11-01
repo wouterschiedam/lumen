@@ -37,6 +37,7 @@ enum ProviderType {
     Openai,
     Phind,
     Groq,
+    Claude,
 }
 
 #[derive(Subcommand)]

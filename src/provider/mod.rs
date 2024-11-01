@@ -1,10 +1,12 @@
 use async_trait::async_trait;
+use claude::ClaudeProvider;
 use groq::GroqProvider;
 use openai::OpenAIProvider;
 use phind::PhindProvider;
 
 use crate::{error::LumenError, git_commit::GitCommit, ProviderType};
 
+pub mod claude;
 pub mod groq;
 pub mod openai;
 pub mod phind;
@@ -18,6 +20,7 @@ pub enum LumenProvider {
     OpenAI(Box<OpenAIProvider>),
     Phind(Box<PhindProvider>),
     Groq(Box<GroqProvider>),
+    Claude(Box<ClaudeProvider>),
 }
 
 impl LumenProvider {
@@ -43,6 +46,12 @@ impl LumenProvider {
                     LumenProvider::Groq(Box::new(GroqProvider::new(client, api_key, model)));
                 Ok(provider)
             }
+            ProviderType::Claude => {
+                let api_key = api_key.ok_or(LumenError::MissingApiKey("Claude".to_string()))?;
+                let provider =
+                    LumenProvider::Claude(Box::new(ClaudeProvider::new(client, api_key, model)));
+                Ok(provider)
+            }
         }
     }
 }
@@ -54,6 +63,7 @@ impl AIProvider for LumenProvider {
             LumenProvider::OpenAI(provider) => provider.explain(commit).await,
             LumenProvider::Phind(provider) => provider.explain(commit).await,
             LumenProvider::Groq(provider) => provider.explain(commit).await,
+            LumenProvider::Claude(provider) => provider.explain(commit).await,
         }
     }
 }
