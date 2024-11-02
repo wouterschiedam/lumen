@@ -40,20 +40,48 @@ impl LumenCommand {
         Ok(())
     }
 
-    pub async fn explain(&self, sha: String) -> Result<(), LumenError> {
-        let commit = GitCommit::new(sha)?;
+    pub async fn explain(&self, sha: Option<String>) -> Result<(), LumenError> {
+        let commit;
 
-        let result = format!(
-            "`commit {}` | {} <{}> | {}\n\n{}\n-----\n",
-            commit.full_hash, commit.author_name, commit.author_email, commit.date, commit.message,
-        );
+        if let Some(commit_sha) = sha {
+            // Handle the case where a commit SHA is provided
+            commit = GitCommit::new(commit_sha)?;
+        } else {
+            // No SHA provided, so create a GitCommit with the diff as its message
+            let output = std::process::Command::new("git")
+                .arg("diff")
+                .arg("--staged")
+                .output()?;
 
-        self.print_with_mdcat(result)?;
+            if !output.status.success() {
+                return Err(LumenError::UnknownError(
+                    "Failed to retrieve staged diff".into(),
+                ));
+            }
 
-        let mut spinner = Spinner::new(spinners::Dots, "Generating Summary...", Color::Blue);
+            // Convert diff output to a String for the commit message
+            let diff_content = String::from_utf8_lossy(&output.stdout).to_string();
+
+            // Create a dummy GitCommit object with the diff as its message
+            commit = GitCommit {
+                full_hash: "diff".to_string(),
+                author_name: "Staged Changes".to_string(),
+                author_email: "noreply@example.com".to_string(),
+                date: "Now".to_string(),
+                message: "Summary of staged changes".to_string(),
+                diff: diff_content, // Store the diff content here
+            };
+        }
+
+        // Display loading spinner
+        let mut spinner =
+            spinoff::Spinner::new(spinners::Dots, "Generating Summary...", Color::Blue);
+
+        // Pass the GitCommit object to the provider’s explain function
         let result = self.provider.explain(commit.clone()).await?;
         spinner.success("Done");
 
+        // Print the summary result
         self.print_with_mdcat(result)?;
 
         Ok(())
@@ -94,6 +122,6 @@ impl LumenCommand {
         let mut sha = String::from_utf8(output.stdout)?;
         sha.pop(); // remove trailing newline from echo
 
-        self.explain(sha).await
+        self.explain(Some(sha)).await
     }
 }

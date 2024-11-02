@@ -54,10 +54,18 @@ impl PhindProvider {
         commit_message: &str,
         diff_content: &str,
     ) -> Result<PhindRequest, Box<dyn std::error::Error>> {
-        let user_input = format!(
-            "Please analyze this git commit and provide a summary.\n\nCommit Message:\n{}\n\nDiff Content:\n{}",
-            commit_message, diff_content
-        );
+        // Prioritize the diff content for the summary prompt if available
+        let user_input = if !diff_content.is_empty() {
+            format!(
+                "Please analyze the following staged changes and provide a summary.\n\nDiff Content:\n{}",
+                diff_content
+            )
+        } else {
+            format!(
+                "Please analyze this git commit and provide a summary.\n\nCommit Message:\n{}",
+                commit_message
+            )
+        };
 
         Ok(PhindRequest {
             additional_extension_context: String::new(),
