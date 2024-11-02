@@ -3,7 +3,7 @@ use std::{io, process::Command, string::FromUtf8Error};
 #[derive(Debug, Clone)]
 pub enum GitStagedError {
     CommandError(String),
-    EmptyDiff(String),
+    EmptyDiff(),
 }
 
 impl From<io::Error> for GitStagedError {
@@ -22,7 +22,7 @@ impl std::fmt::Display for GitStagedError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             GitStagedError::CommandError(err) => write!(f, "{err}"),
-            GitStagedError::EmptyDiff(diff) => write!(f, "Diff for commit '{diff}' is empty"),
+            GitStagedError::EmptyDiff() => write!(f, "Diff for staged changes is empty"),
         }
     }
 }
@@ -48,7 +48,7 @@ impl GitStaged {
         let diff = String::from_utf8(output.stdout)?;
 
         if diff.is_empty() {
-            return Err(GitStagedError::EmptyDiff(diff));
+            return Err(GitStagedError::EmptyDiff());
         }
 
         Ok(diff)
