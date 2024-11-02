@@ -4,7 +4,7 @@ use groq::GroqProvider;
 use openai::OpenAIProvider;
 use phind::PhindProvider;
 
-use crate::{error::LumenError, git_commit::GitCommit, ProviderType};
+use crate::{command::Git, error::LumenError, git_commit::GitCommit, ProviderType};
 
 pub mod claude;
 pub mod groq;
@@ -13,7 +13,7 @@ pub mod phind;
 
 #[async_trait]
 pub trait AIProvider {
-    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>>;
+    async fn explain(&self, commit: Git) -> Result<String, Box<dyn std::error::Error>>;
 }
 
 pub enum LumenProvider {
@@ -58,7 +58,7 @@ impl LumenProvider {
 
 #[async_trait]
 impl AIProvider for LumenProvider {
-    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
+    async fn explain(&self, commit: Git) -> Result<String, Box<dyn std::error::Error>> {
         match self {
             LumenProvider::OpenAI(provider) => provider.explain(commit).await,
             LumenProvider::Phind(provider) => provider.explain(commit).await,

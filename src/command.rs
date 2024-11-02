@@ -2,10 +2,17 @@ use std::process::Stdio;
 
 use crate::error::LumenError;
 use crate::git_commit::GitCommit;
+use crate::git_staged::GitStaged;
 use crate::provider::AIProvider;
 use crate::provider::LumenProvider;
 
 use spinoff::{spinners, Color, Spinner};
+
+#[derive(Clone)]
+pub enum Git {
+    Commit(GitCommit),
+    Staged(GitStaged),
+}
 
 pub struct LumenCommand {
     provider: LumenProvider,
@@ -17,15 +24,6 @@ impl LumenCommand {
     }
 
     pub fn print_with_mdcat(&self, content: String) -> Result<(), LumenError> {
-        let non_interactive = std::env::var("NON_INTERACTIVE").is_ok();
-
-        if non_interactive {
-            // In non-interactive mode, strip ANSI codes and print directly
-            let stripped_content = String::from_utf8(strip_ansi_escapes::strip(&content)?)?;
-            println!("{}", stripped_content);
-            return Ok(());
-        }
-
         match std::process::Command::new("mdcat")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -50,57 +48,39 @@ impl LumenCommand {
     }
 
     pub async fn explain(&self, sha: Option<String>) -> Result<(), LumenError> {
-        let commit;
-
-        // Check for non-interactive mode by looking for an environment variable
-        let non_interactive = std::env::var("NON_INTERACTIVE").is_ok();
+        let git;
 
         if let Some(commit_sha) = sha {
             // Handle the case where a commit SHA is provided
-            commit = GitCommit::new(commit_sha)?;
-        } else {
-            // No SHA provided, so create a GitCommit with the diff as its message
-            let output = std::process::Command::new("git")
-                .arg("diff")
-                .arg("--staged")
-                .output()?;
+            git = Git::Commit(GitCommit::new(commit_sha)?);
 
-            if !output.status.success() {
-                return Err(LumenError::UnknownError(
-                    "Failed to retrieve staged diff".into(),
-                ));
-            }
-
-            // Convert diff output to a String for the commit message
-            let diff_content = String::from_utf8_lossy(&output.stdout).to_string();
-
-            // Create a dummy GitCommit object with the diff as its message
-            commit = GitCommit {
-                full_hash: "diff".to_string(),
-                author_name: "Staged Changes".to_string(),
-                author_email: "noreply@example.com".to_string(),
-                date: "Now".to_string(),
-                message: "Summary of staged changes".to_string(),
-                diff: diff_content, // Store the diff content here
+            let result = match &git {
+                Git::Commit(commit) => format!(
+                    "`commit {}` | {} <{}> | {}\n\n{}\n-----\n",
+                    commit.full_hash,
+                    commit.author_name,
+                    commit.author_email,
+                    commit.date,
+                    commit.message,
+                ),
+                Git::Staged(_) => {
+                    return Err(LumenError::UnknownError(
+                        "Expected a commit, but found staged changes.".into(),
+                    ));
+                }
             };
+
+            self.print_with_mdcat(result)?;
+        } else {
+            git = Git::Staged(GitStaged::new()?);
         }
 
-        let mut spinner = if !non_interactive {
-            Some(spinoff::Spinner::new(
-                spinners::Dots,
-                "Generating Summary...",
-                Color::Blue,
-            ))
-        } else {
-            None
-        };
+        let mut spinner = Spinner::new(spinners::Dots, "Generating Summary...", Color::Blue);
 
         // Pass the GitCommit object to the provider’s explain function
-        let result = self.provider.explain(commit.clone()).await?;
+        let result = self.provider.explain(git.clone()).await?;
 
-        if let Some(mut spinner) = spinner {
-            spinner.success("Done");
-        }
+        spinner.success("Done");
 
         // Print the summary result
         self.print_with_mdcat(result)?;

@@ -7,6 +7,7 @@ use tokio;
 mod command;
 mod error;
 mod git_commit;
+mod git_staged;
 mod provider;
 
 #[derive(Parser)]
@@ -43,11 +44,10 @@ enum ProviderType {
 #[derive(Subcommand)]
 enum Commands {
     Explain {
-        #[arg(required = false)]
-        sha: Option<String>,
-        #[arg(long)]
-        diff: bool,
+        #[arg()]
+        sha: String,
     },
+    Suggest,
     List,
 }
 
@@ -66,17 +66,11 @@ async fn run() -> Result<(), LumenError> {
     let command = command::LumenCommand::new(provider);
 
     match cli.command {
-        Commands::Explain { sha, diff } => {
-            if diff {
-                command.explain(None).await?; // Pass `None` to summarize the staged diff
-            } else if let Some(commit_sha) = sha {
-                command.explain(Some(commit_sha)).await?; // Pass `Some(commit_sha)` for a specific commit
-            } else {
-                eprintln!("Please provide a commit SHA or use --diff to summarize staged changes.");
-                return Err(LumenError::UnknownError(
-                    "Missing SHA or --diff flag".into(),
-                ));
-            }
+        Commands::Explain { sha } => {
+            command.explain(Some(sha)).await?;
+        }
+        Commands::Suggest {} => {
+            command.explain(None).await?;
         }
         Commands::List => command.list().await?,
     }

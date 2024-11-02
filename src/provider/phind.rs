@@ -1,4 +1,4 @@
-use crate::git_commit::GitCommit;
+use crate::{command::Git, git_commit::GitCommit};
 
 use super::AIProvider;
 use async_trait::async_trait;
@@ -51,20 +51,22 @@ impl PhindProvider {
 
     async fn create_request(
         &self,
-        commit_message: &str,
+        commit_message: Option<&str>,
         diff_content: &str,
     ) -> Result<PhindRequest, Box<dyn std::error::Error>> {
         // Prioritize the diff content for the summary prompt if available
-        let user_input = if !diff_content.is_empty() {
+        let user_input = if let Some(message) = commit_message {
             format!(
-                "Please analyze the following staged changes and provide a short, concise title and a detailed summary.\n\nDiff Content:\n{}",
-                diff_content
-            )
+                    "Please analyze this git commit and provide a summary.\n\nCommit Message:\n{}\n\nDiff Content:\n{}",
+                    message, diff_content
+                )
+        } else if !diff_content.is_empty() {
+            format!(
+            "Please analyze the following staged changes and provide a short, concise title and a detailed summary.\n\nDiff Content:\n{}",
+            diff_content
+        )
         } else {
-            format!(
-                "Please analyze this git commit and provide a short, concise title and a detailed summary.\n\nCommit Message:\n{}",
-                commit_message
-            )
+            "No commit message or diff content available.".to_string()
         };
 
         Ok(PhindRequest {
@@ -112,8 +114,15 @@ impl PhindProvider {
 
 #[async_trait]
 impl AIProvider for PhindProvider {
-    async fn explain(&self, commit: GitCommit) -> Result<String, Box<dyn std::error::Error>> {
-        let request = self.create_request(&commit.message, &commit.diff).await?;
+    async fn explain(&self, git: Git) -> Result<String, Box<dyn std::error::Error>> {
+        let request = match git {
+            Git::Commit(ref commit) => {
+                self.create_request(Some(commit.message.as_str()), commit.diff.as_str())
+                    .await?
+            }
+            Git::Staged(ref staged) => self.create_request(None, staged.diff.as_str()).await?,
+        };
+
         let headers = Self::create_headers()?;
 
         let response = self
