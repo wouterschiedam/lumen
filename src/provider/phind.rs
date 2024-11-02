@@ -57,12 +57,12 @@ impl PhindProvider {
         // Prioritize the diff content for the summary prompt if available
         let user_input = if !diff_content.is_empty() {
             format!(
-                "Please analyze the following staged changes and provide a summary.\n\nDiff Content:\n{}",
+                "Please analyze the following staged changes and provide a short, concise title and a detailed summary.\n\nDiff Content:\n{}",
                 diff_content
             )
         } else {
             format!(
-                "Please analyze this git commit and provide a summary.\n\nCommit Message:\n{}",
+                "Please analyze this git commit and provide a short, concise title and a detailed summary.\n\nCommit Message:\n{}",
                 commit_message
             )
         };

@@ -17,6 +17,15 @@ impl LumenCommand {
     }
 
     pub fn print_with_mdcat(&self, content: String) -> Result<(), LumenError> {
+        let non_interactive = std::env::var("NON_INTERACTIVE").is_ok();
+
+        if non_interactive {
+            // In non-interactive mode, strip ANSI codes and print directly
+            let stripped_content = String::from_utf8(strip_ansi_escapes::strip(&content)?)?;
+            println!("{}", stripped_content);
+            return Ok(());
+        }
+
         match std::process::Command::new("mdcat")
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
@@ -42,6 +51,9 @@ impl LumenCommand {
 
     pub async fn explain(&self, sha: Option<String>) -> Result<(), LumenError> {
         let commit;
+
+        // Check for non-interactive mode by looking for an environment variable
+        let non_interactive = std::env::var("NON_INTERACTIVE").is_ok();
 
         if let Some(commit_sha) = sha {
             // Handle the case where a commit SHA is provided
@@ -73,13 +85,22 @@ impl LumenCommand {
             };
         }
 
-        // Display loading spinner
-        let mut spinner =
-            spinoff::Spinner::new(spinners::Dots, "Generating Summary...", Color::Blue);
+        let mut spinner = if !non_interactive {
+            Some(spinoff::Spinner::new(
+                spinners::Dots,
+                "Generating Summary...",
+                Color::Blue,
+            ))
+        } else {
+            None
+        };
 
         // Pass the GitCommit object to the provider’s explain function
         let result = self.provider.explain(commit.clone()).await?;
-        spinner.success("Done");
+
+        if let Some(mut spinner) = spinner {
+            spinner.success("Done");
+        }
 
         // Print the summary result
         self.print_with_mdcat(result)?;
