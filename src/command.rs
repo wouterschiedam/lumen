@@ -38,7 +38,14 @@ impl LumenCommand {
                         .wait()?;
                 }
                 let output = mdcat.wait_with_output()?;
-                println!("{}", String::from_utf8(output.stdout)?);
+                let printline = String::from_utf8(output.stdout)?;
+                let printline: String = printline
+                    .lines()
+                    .skip(1) // Skip the first line
+                    .collect::<Vec<&str>>() // Collect remaining lines
+                    .join("\n");
+
+                println!("{}", printline);
             }
             Err(_) => {
                 println!("{}", content);
